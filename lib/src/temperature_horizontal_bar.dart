@@ -11,6 +11,10 @@ class TemperatureHorizontalBar extends StatefulWidget {
   final Color? baseBgColor;
   final Color? gradientStartColor;
   final Color? gradientEndColor;
+  final double? barWidth;
+  final double? barHeight;
+  final double? circleSize;
+  final int? barPointCount;
   final bool showCountView;
 
   const TemperatureHorizontalBar(
@@ -20,6 +24,10 @@ class TemperatureHorizontalBar extends StatefulWidget {
     this.baseBgColor = TPColors.baseBgColor,
     this.gradientStartColor = TPColors.baseGradientBottomColor,
     this.gradientEndColor = TPColors.baseGradientTopColor,
+    this.barWidth,
+    this.barHeight,
+    this.circleSize,
+    this.barPointCount,
     this.showCountView = false,
   }) : super(key: key);
 
@@ -28,27 +36,44 @@ class TemperatureHorizontalBar extends StatefulWidget {
 }
 
 class _TemperatureHorizontalBar extends State<TemperatureHorizontalBar> {
+  double? _barWidth;
+  double? _barHeight;
+  double? _circleSize;
+
+  @override
+  void initState() {
+
+    if (mounted) {
+      setState(() {
+        _barWidth = widget.barWidth ?? ConstValue.baseHorizontalWidth;
+        _barHeight = widget.barHeight ?? ConstValue.baseHorizontalHeight;
+        _circleSize = widget.circleSize ?? CircleValue.size;
+      });
+    }
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return _buildBody();
+    return _buildBody(height: _circleSize!);
   }
 
-  Widget _buildBody({double height = ConstValue.baseHorizontalHeight * 2}) {
+  Widget _buildBody({double height = CircleValue.size}) {
     return Wrap(
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             SizedBox(
-              height: height,
+              height: height * 1.5,
               child: Stack(
                 alignment: AlignmentDirectional.centerStart,
                 children: [
                   Stack(
                     alignment: Alignment.centerLeft,
                     children: [
-                      _buildBarBg(),
+                      _buildBarBg(width: _barWidth!, height: _barHeight!),
                     ],
                   ),
                   Positioned(
@@ -58,19 +83,19 @@ class _TemperatureHorizontalBar extends State<TemperatureHorizontalBar> {
                       child: Stack(
                         alignment: AlignmentDirectional.center,
                         children: [
-                          _buildCircle(),
-                          _buildCircle(circleSize: CircleValue.size * 0.9, bgColor: widget.gradientStartColor),
-                          _buildCircle(circleSize: CircleValue.size / 3, bgColor: widget.baseBgColor)
+                          _buildCircle(circleSize: _circleSize!),
+                          _buildCircle(circleSize: _circleSize! * 0.9, bgColor: widget.gradientStartColor),
+                          _buildCircle(circleSize: _circleSize! / 3, bgColor: widget.baseBgColor)
                         ],
                       )
                   ),
                   Positioned(
-                      child: _buildBar(width: ConstValue.baseHorizontalWidth * (widget.currentIndex > widget.maxIndex ? 1 : (widget.currentIndex / widget.maxIndex * 100 / 100)))
+                      child: _buildBar(height: _barHeight! ,width: _barWidth! * (widget.currentIndex > widget.maxIndex ? 1 : (widget.currentIndex / widget.maxIndex * 100 / 100)))
                   ),
                   Positioned(
                       top: 0, left: 0, right: 0,
                       child: SizedBox(
-                        width: ConstValue.baseHorizontalWidth + CircleValue.size,
+                        width: (_barWidth ?? ConstValue.baseHorizontalWidth) + (_circleSize ?? CircleValue.size),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: _buildBarPointLine(),
@@ -89,21 +114,21 @@ class _TemperatureHorizontalBar extends State<TemperatureHorizontalBar> {
 
   _buildCount() {
     return !widget.showCountView ? const SizedBox() : Padding(
-      padding: const EdgeInsets.only(bottom: 15, left: 5),
+      padding: EdgeInsets.only(bottom: _circleSize! / 2, left: 5),
       child: Text('${widget.currentIndex}/${widget.maxIndex}'),
     );
   }
 
-  _buildBar({double width = ConstValue.baseHorizontalWidth, double height = ConstValue.baseHorizontalHeight / 1.8}) {
+  _buildBar({double width = ConstValue.baseHorizontalWidth, double height = ConstValue.baseHorizontalHeight}) {
     return Row(
       children: [
         Container(
           decoration: BoxDecoration(
             color: widget.gradientStartColor!,
           ),
-          margin: const EdgeInsets.only(left: CircleValue.size),
+          margin: EdgeInsets.only(left: _circleSize ?? CircleValue.size),
           width: width / 2,
-          height: height,
+          height: height / 1.8,
         ),
         AnimatedContainer(
           decoration: BoxDecoration(
@@ -111,7 +136,7 @@ class _TemperatureHorizontalBar extends State<TemperatureHorizontalBar> {
             gradient: LinearGradient(colors: [widget.gradientStartColor!, widget.gradientEndColor!], begin: Alignment.centerLeft, end: Alignment.centerRight),
           ),
           width: width - (width / 2),
-          height: height,
+          height: height / 1.8,
           duration: const Duration(seconds: 1),
         ),
       ],
@@ -120,12 +145,13 @@ class _TemperatureHorizontalBar extends State<TemperatureHorizontalBar> {
 
   _buildBarPointLine() {
     List<Widget> list = [];
+    int barPointCount = widget.barPointCount ?? ((_barWidth ?? ConstValue.baseHorizontalWidth) < 100 ? 4 : 7);
 
-    for(int i=0; i<7; i++) {
+    for (int i=0; i<barPointCount; i++) {
       list.add(Container(
-        margin: const EdgeInsets.only(top: 17, right: 4, left: 5),
+        margin: EdgeInsets.only(top: (_circleSize! - (_barHeight! / 1.8)), right: 4, left: 5),
         width: 1.5,
-        height: ConstValue.baseVerticalWidth / 2.2,
+        height: (_barHeight ?? ConstValue.baseHorizontalHeight) * 0.25,
         color: widget.baseBgColor!.withOpacity(0.8),
         child: const SizedBox(),
       ));
@@ -145,7 +171,7 @@ class _TemperatureHorizontalBar extends State<TemperatureHorizontalBar> {
               borderRadius: const BorderRadius.only(bottomRight: Radius.circular(CircleValue.radius), topRight: Radius.circular(CircleValue.radius)),
               border: Border.all(width: 6, color: widget.baseBgColor!)
           ),
-          width: width + CircleValue.size - 5,
+          width: width + (_circleSize ?? CircleValue.size) - 5,
           height: height,
         ),
       ],
