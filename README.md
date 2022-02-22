@@ -25,4 +25,6 @@ For example, complete 10 missions of the day gauge 5/10.
 4. Adjustable gauge bar up and down, left and right length and round size
    (option)
 
+##### Sample code ([Source Code](/lib/sample_code.dart))
+
 
