@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_custom_ui/home.dart';
+import 'package:flutter_custom_ui/sample_code.dart';
 import 'package:flutter_custom_ui/src/temperature_horizontal_bar.dart';
 import 'package:flutter_custom_ui/src/temperature_vertical_bar.dart';
 
@@ -41,7 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: const Home(),
+      body: const SampleCode(),
     );
   }
 }

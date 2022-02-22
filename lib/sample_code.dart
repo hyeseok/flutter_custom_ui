@@ -5,15 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_custom_ui/src/temperature_horizontal_bar.dart';
 import 'package:flutter_custom_ui/src/temperature_vertical_bar.dart';
 
-class Home extends StatefulWidget {
+class SampleCode extends StatefulWidget {
 
-  const Home({Key? key}) : super(key: key);
+  const SampleCode({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _Home();
+  State<StatefulWidget> createState() => _SampleCode();
 }
 
-class _Home extends State<Home> {
+class _SampleCode extends State<SampleCode> {
   int? _currentIndex;
   int? _currentIndex2;
 
